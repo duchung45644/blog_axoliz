@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, TIMESTAMP, func
 from app.database import Base
+from sqlalchemy.orm import relationship
 
 
 class User(Base):
@@ -14,3 +15,6 @@ class User(Base):
     bio = Column(Text)
     created_at = Column(TIMESTAMP, default=func.now())
     updated_at = Column(TIMESTAMP, default=func.now(), onupdate=func.now())
+
+    posts = relationship("Post", back_populates="user")
+    comments = relationship("Comment", back_populates="user")
