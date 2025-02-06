@@ -1,25 +1,96 @@
+from sqlalchemy.sql import text
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
+
+from app.schemas.users_schema import UserCreate, UserUpdate
 from app.models.users import User
-from app.schemas.users_schema import UserCreate
-
-
-def get_user_by_id(db: Session, user_id: int):
-    return db.query(User).filter(User.id == user_id).first()
-
-
-def get_user_by_email(db: Session, email: str):
-    return db.query(User).filter(User.email == email).first()
 
 
 def create_user(db: Session, user: UserCreate):
-    db_user = User(
-        username=user.username,
-        email=user.email,
-        password=user.password,  # Hash the password before saving
-        full_name=user.full_name,
-        bio=user.bio
+    try:
+        result = db.execute(
+            text(
+                """
+                SELECT func_users_create(
+                    :username,
+                    :email,
+                    :password,
+                    :full_name,
+                    :profile_picture,
+                    :bio
+                )
+            """
+            ),
+            {
+                "username": user.username,
+                "email": user.email,
+                "password": user.password,
+                "full_name": user.full_name,
+                "profile_picture": user.profile_picture,
+                "bio": user.bio,
+            },
+        ).fetchone()
+
+        db.commit()
+        return {"message": "User created successfully", "user_id": result[0]}
+
+    except Exception as e:
+        error_message = str(e)
+
+        if "username-exists" in error_message:
+            raise HTTPException(status_code=400, detail="Username already exists")
+        elif "email-exists" in error_message:
+            raise HTTPException(status_code=400, detail="Email already exists")
+
+        raise HTTPException(
+            status_code=500, detail=f"Unexpected error: {error_message}"
+        )
+
+
+def update_user(db: Session, user_id: int, user: UserUpdate):
+    db.execute(
+        text(
+            """
+            SELECT func_users_update(
+                :id, 
+                :full_name, 
+                :profile_picture, 
+                :bio, 
+                :password
+            )
+        """
+        ),
+        {
+            "id": user_id,
+            "full_name": user.full_name,
+            "profile_picture": user.profile_picture,
+            "bio": user.bio,
+            "password": user.password if user.password else None,
+        },
     )
-    db.add(db_user)
     db.commit()
-    db.refresh(db_user)
-    return db_user
+    return {"message": "User updated successfully"}
+
+
+def delete_user(db: Session, user_id: int):
+    result = db.execute(text("CALL func_users_delete(:id)"), {"id": user_id})
+
+    db.commit()
+
+    if result.rowcount == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return {"message": "User deleted successfully"}
+
+
+def get_user(db: Session, user_id: int):
+    result = (
+        db.execute(text("SELECT * FROM func_users_read(:id)"), {"id": user_id})
+        .mappings()
+        .fetchone()
+    )
+
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return result

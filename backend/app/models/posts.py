@@ -1,15 +1,24 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Text, TIMESTAMP, func
-from app.database import Base
+from sqlalchemy import (
+    Boolean,
+    Column,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    TIMESTAMP,
+    func,
+)
 from sqlalchemy.orm import relationship
-
-from app.models.post_tags import PostTag
+from app.database import Base
 
 
 class Post(Base):
     __tablename__ = "posts"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     category_id = Column(Integer, ForeignKey("categories.id", ondelete="SET NULL"))
     title = Column(String(200), nullable=False)
     slug = Column(String(200), unique=True, nullable=False)
@@ -21,7 +30,9 @@ class Post(Base):
     created_at = Column(TIMESTAMP, default=func.now())
     updated_at = Column(TIMESTAMP, default=func.now(), onupdate=func.now())
 
-    user = relationship("User", back_populates="posts")
-    category = relationship("Category", back_populates="posts")
-    tags = relationship("Tag", secondary="post_tags", back_populates="posts")
-    comments = relationship("Comment", back_populates="post")
+    user = relationship("User", back_populates="posts", lazy="joined")
+    category = relationship("Category", back_populates="posts", lazy="joined")
+    tags = relationship(
+        "Tag", secondary="post_tags", back_populates="posts", lazy="joined"
+    )
+    comments = relationship("Comment", back_populates="post", lazy="joined")

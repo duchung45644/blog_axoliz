@@ -1,8 +1,7 @@
-from sqlalchemy import Column,  Integer, String,  TIMESTAMP, func
+from sqlalchemy import Column, Integer, String, TIMESTAMP, func
 from app.database import Base
 
 from sqlalchemy.orm import relationship
-from app.models.post_tags import PostTag
 
 
 class Tag(Base):

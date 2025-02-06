@@ -6,8 +6,7 @@ from app.config.base import settings
 DATABASE_URL = settings.DATABASE_URL
 
 # Create engine and session
-engine = create_engine(DATABASE_URL,
-                       connect_args={"options": "-c timezone=utc"})
+engine = create_engine(DATABASE_URL, connect_args={"options": "-c timezone=utc"})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Base for models
