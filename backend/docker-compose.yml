@@ -2,10 +2,8 @@ version: "3.8"
 services:
   db:
     image: postgres:17
-    environment:
-      POSTGRES_USER: axoliz
-      POSTGRES_PASSWORD: 'axoliz'
-      POSTGRES_DB: axoliz_blog
+    env_file:
+      - .env
     ports:
       - "5432:5432"
     volumes:
@@ -13,12 +11,14 @@ services:
 
   app:
     build: .
+    env_file:
+      - .env
     ports:
       - "8000:8000"
     depends_on:
       - db
-    environment:
-      DATABASE_URL: postgresql://user:password@db:5432/your_database
+    volumes:
+      - .:/app # Hỗ trợ hot-reload khi dev
 
 volumes:
   db_data:
