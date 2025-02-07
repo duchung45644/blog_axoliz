@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from fastapi import HTTPException
 
+from app.constants import ErrorMessages as ErrMsg
 from app.schemas.comments_schema import CommentCreate, CommentUpdate
 
 
@@ -26,9 +27,9 @@ def create_comment(db: Session, comment: CommentCreate):
 
     except Exception as e:
         if "Post does not exist" in str(e):
-            raise HTTPException(status_code=404, detail="Post not found")
+            raise HTTPException(status_code=404, detail=ErrMsg.POST_NOT_FOUND)
         if "Parent comment does not exist" in str(e):
-            raise HTTPException(status_code=404, detail="Parent comment not found")
+            raise HTTPException(status_code=404, detail=ErrMsg.COMMENT_PARENT_NOT_FOUND)
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 
@@ -53,7 +54,7 @@ def get_comment_by_id(db: Session, comment_id: int):
         .fetchone()
     )
     if not result:
-        raise HTTPException(status_code=404, detail="Comment not found")
+        raise HTTPException(status_code=404, detail=ErrMsg.COMMENT_NOT_FOUND)
 
     return dict(result)
 
@@ -70,7 +71,7 @@ def update_comment(db: Session, comment_id: int, comment: CommentUpdate):
     except Exception as e:
         error_message = str(e)
         if "Comment not found" in error_message:
-            raise HTTPException(status_code=404, detail="Comment not found")
+            raise HTTPException(status_code=404, detail=ErrMsg.COMMENT_NOT_FOUND)
         raise HTTPException(
             status_code=500, detail=f"Unexpected error: {error_message}"
         )
@@ -85,7 +86,7 @@ def delete_comment(db: Session, comment_id: int):
     except Exception as e:
         error_message = str(e)
         if "Comment not found" in error_message:
-            raise HTTPException(status_code=404, detail="Comment not found")
+            raise HTTPException(status_code=404, detail=ErrMsg.COMMENT_NOT_FOUND)
         raise HTTPException(
             status_code=500, detail=f"Unexpected error: {error_message}"
         )

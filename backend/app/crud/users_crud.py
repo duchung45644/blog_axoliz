@@ -2,6 +2,7 @@ from sqlalchemy.sql import text
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from app.constants import ErrorMessages as ErrMsg
 from app.schemas.users_schema import UserCreate, UserUpdate
 from app.models.users import User
 
@@ -38,9 +39,9 @@ def create_user(db: Session, user: UserCreate):
         error_message = str(e)
 
         if "username-exists" in error_message:
-            raise HTTPException(status_code=400, detail="Username already exists")
+            raise HTTPException(status_code=400, detail=ErrMsg.USERNAME_EXISTS)
         elif "email-exists" in error_message:
-            raise HTTPException(status_code=400, detail="Email already exists")
+            raise HTTPException(status_code=400, detail=ErrMsg.EMAIL_EXISTS)
 
         raise HTTPException(
             status_code=500, detail=f"Unexpected error: {error_message}"
@@ -78,7 +79,7 @@ def delete_user(db: Session, user_id: int):
     db.commit()
 
     if result.rowcount == 0:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail=ErrMsg.USER_NOT_FOUND)
 
     return {"message": "User deleted successfully"}
 
@@ -91,6 +92,6 @@ def get_user(db: Session, user_id: int):
     )
 
     if not result:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=404, detail=ErrMsg.USER_NOT_FOUND)
 
     return result

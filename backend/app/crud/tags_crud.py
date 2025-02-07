@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from fastapi import HTTPException
 
+from app.constants import ErrorMessages as ErrMsg
 from app.schemas.tags_schema import TagCreate, TagUpdate
 
 
@@ -23,9 +24,9 @@ def create_tag(db: Session, tag: TagCreate):
 
     except Exception as e:
         if "Tag name already exists" in str(e):
-            raise HTTPException(status_code=400, detail="Tag name already exists")
+            raise HTTPException(status_code=400, detail=ErrMsg.TAG_NAME_EXISTS)
         if "Tag slug already exists" in str(e):
-            raise HTTPException(status_code=400, detail="Tag slug already exists")
+            raise HTTPException(status_code=400, detail=ErrMsg.TAG_SLUG_EXISTS)
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 
@@ -42,7 +43,7 @@ def get_tag_by_id(db: Session, tag_id: int):
     )
 
     if not result:
-        raise HTTPException(status_code=404, detail="Tag not found")
+        raise HTTPException(status_code=404, detail=ErrMsg.TAG_NOT_FOUND)
 
     return dict(result)
 
@@ -63,9 +64,9 @@ def update_tag(db: Session, tag_id: int, tag: TagUpdate):
 
     except Exception as e:
         if "Tag name already exists" in str(e):
-            raise HTTPException(status_code=400, detail="Tag name already exists")
+            raise HTTPException(status_code=400, detail=ErrMsg.TAG_NAME_EXISTS)
         if "Tag slug already exists" in str(e):
-            raise HTTPException(status_code=400, detail="Tag slug already exists")
+            raise HTTPException(status_code=400, detail=ErrMsg.TAG_SLUG_EXISTS)
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 

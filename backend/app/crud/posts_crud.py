@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from fastapi import HTTPException
 
+from app.constants import ErrorMessages as ErrMsg
 from app.schemas.posts_schema import PostCreate, PostUpdate
 
 
@@ -41,11 +42,11 @@ def create_post(db: Session, post: PostCreate):
     except Exception as e:
         error_message = str(e)
         if "User does not exist" in error_message:
-            raise HTTPException(status_code=404, detail="User does not exist")
+            raise HTTPException(status_code=404, detail=ErrMsg.USER_NOT_FOUND)
         if "Category does not exist" in error_message:
-            raise HTTPException(status_code=404, detail="Category does not exist")
+            raise HTTPException(status_code=404, detail=ErrMsg.CATEGORY_NOT_FOUND)
         if "Post slug already exists" in error_message:
-            raise HTTPException(status_code=400, detail="Post slug already exists")
+            raise HTTPException(status_code=400, detail=ErrMsg.POST_SLUG_EXISTS)
 
         raise HTTPException(
             status_code=500, detail=f"Unexpected error: {error_message}"
@@ -62,7 +63,7 @@ def get_post_by_id(db: Session, post_id: int):
     )
 
     if not result:
-        raise HTTPException(status_code=404, detail="Post not found")
+        raise HTTPException(status_code=404, detail=ErrMsg.POST_NOT_FOUND)
 
     return result
 
@@ -173,13 +174,11 @@ def update_post(db: Session, post_id: int, post: PostUpdate):
     except Exception as e:
         error_message = str(e)
         if "Post not found" in error_message:
-            raise HTTPException(status_code=404, detail="Post not found")
+            raise HTTPException(status_code=404, detail=ErrMsg.POST_NOT_FOUND)
 
         raise HTTPException(
             status_code=500, detail=f"Unexpected error: {error_message}"
         )
-
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 
 def delete_post(db: Session, post_id: int):
@@ -190,7 +189,7 @@ def delete_post(db: Session, post_id: int):
     ).scalar()
 
     if not post_exists:
-        raise HTTPException(status_code=404, detail="Post not found")
+        raise HTTPException(status_code=404, detail=ErrMsg.POST_NOT_FOUND)
 
     try:
         db.execute(text("SELECT func_posts_delete(:post_id)"), {"post_id": post_id})
@@ -200,7 +199,7 @@ def delete_post(db: Session, post_id: int):
     except Exception as e:
         error_message = str(e)
         if "Post not found" in error_message:
-            raise HTTPException(status_code=404, detail="Post not found")
+            raise HTTPException(status_code=404, detail=ErrMsg.POST_NOT_FOUND)
 
         raise HTTPException(
             status_code=500, detail=f"Unexpected error: {error_message}"
