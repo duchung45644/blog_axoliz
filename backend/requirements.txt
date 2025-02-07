@@ -9,3 +9,6 @@ bcrypt
 loguru
 pydantic[email]
 passlib
+passlib[bcrypt] 
+pyjwt
+python-multipart

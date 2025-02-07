@@ -107,6 +107,27 @@ def get_all_posts(
         raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
 
 
+def search_posts(db: Session, query: str, limit: int = 10, offset: int = 0):
+    try:
+        result = (
+            db.execute(
+                text(
+                    """
+                SELECT * FROM func_posts_search(:query, :limit, :offset)
+            """
+                ),
+                {"query": query, "limit": limit, "offset": offset},
+            )
+            .mappings()
+            .all()
+        )
+
+        return result
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
+
+
 def update_post(db: Session, post_id: int, post: PostUpdate):
 
     post_exists = db.execute(
