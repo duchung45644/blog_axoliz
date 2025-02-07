@@ -9,12 +9,17 @@ from app.crud.comments_crud import (
     delete_comment,
 )
 from app.database import get_db
+from app.middleware.login import get_current_user
 
 router = APIRouter()
 
 
 @router.post("/", response_model=dict)
-def create_comment_endpoint(comment: CommentCreate, db: Session = Depends(get_db)):
+def create_comment_endpoint(
+    comment: CommentCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     return create_comment(db, comment)
 
 
@@ -30,11 +35,18 @@ def get_comment_by_id_endpoint(comment_id: int, db: Session = Depends(get_db)):
 
 @router.put("/{comment_id}")
 def update_comment_endpoint(
-    comment_id: int, comment: CommentUpdate, db: Session = Depends(get_db)
+    comment_id: int,
+    comment: CommentUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     return update_comment(db, comment_id, comment)
 
 
 @router.delete("/{comment_id}")
-def delete_comment_endpoint(comment_id: int, db: Session = Depends(get_db)):
+def delete_comment_endpoint(
+    comment_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     return delete_comment(db, comment_id)

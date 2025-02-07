@@ -4,6 +4,7 @@ from app.database import get_db
 
 from app.crud.users_crud import create_user, delete_user, get_user, update_user
 from app.schemas.users_schema import UserCreate, UserOut, UserUpdate
+from app.middleware.login import get_current_user
 
 
 router = APIRouter()
@@ -24,14 +25,23 @@ def get_user_endpoint(user_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{user_id}", response_model=UserOut)
-def update_user_endpoint(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
+def update_user_endpoint(
+    user_id: int,
+    user: UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     update_user(db, user_id, user)
     updated_user = get_user(db, user_id)
     return UserOut.from_orm_with_iso_dates(updated_user)
 
 
 @router.delete("/{user_id}")
-def delete_user_endpoint(user_id: int, db: Session = Depends(get_db)):
+def delete_user_endpoint(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     try:
         get_user(db, user_id)
         delete_user(db, user_id)

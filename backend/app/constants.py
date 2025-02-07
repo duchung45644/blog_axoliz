@@ -3,6 +3,7 @@ class ErrorMessages:
     CATEGORY_SLUG_EXISTS = "Category slug already exists"
     CATEGORY_NOT_FOUND = "Category not found"
 
+    INVALID_CREDENTIALS = "Invalid username or password"
     USER_NOT_FOUND = "User not found"
     USERNAME_EXISTS = "Username already exists"
     EMAIL_EXISTS = "Email already exists"

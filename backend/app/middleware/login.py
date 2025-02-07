@@ -17,10 +17,11 @@ def get_current_user(
 
     user_id = payload["sub"]
     user = db.execute(
-        text("SELECT * FROM users WHERE id = :user_id"), {"user_id": user_id}
+        text("SELECT id, username, email FROM users WHERE id = :user_id"),
+        {"user_id": user_id},
     ).fetchone()
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return user
+    return dict(user)

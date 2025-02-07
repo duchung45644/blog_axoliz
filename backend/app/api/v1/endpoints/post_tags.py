@@ -8,12 +8,17 @@ from app.crud.post_tags_crud import (
     delete_post_tag,
 )
 from app.database import get_db
+from app.middleware.login import get_current_user
 
 router = APIRouter()
 
 
 @router.post("/", response_model=dict)
-def create_post_tag_endpoint(post_tag: PostTagCreate, db: Session = Depends(get_db)):
+def create_post_tag_endpoint(
+    post_tag: PostTagCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     return create_post_tag(db, post_tag)
 
 
@@ -28,5 +33,10 @@ def get_posts_by_tag_endpoint(tag_id: int, db: Session = Depends(get_db)):
 
 
 @router.delete("/{post_id}/{tag_id}")
-def delete_post_tag_endpoint(post_id: int, tag_id: int, db: Session = Depends(get_db)):
+def delete_post_tag_endpoint(
+    post_id: int,
+    tag_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     return delete_post_tag(db, post_id, tag_id)

@@ -9,12 +9,17 @@ from app.crud.categories_crud import (
     delete_category,
 )
 from app.database import get_db
+from app.middleware.login import get_current_user
 
 router = APIRouter()
 
 
 @router.post("/", response_model=dict)
-def create_category_endpoint(category: CategoryCreate, db: Session = Depends(get_db)):
+def create_category_endpoint(
+    category: CategoryCreate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     return create_category(db, category)
 
 
@@ -30,11 +35,18 @@ def get_category_by_id_endpoint(category_id: int, db: Session = Depends(get_db))
 
 @router.put("/{category_id}")
 def update_category_endpoint(
-    category_id: int, category: CategoryUpdate, db: Session = Depends(get_db)
+    category_id: int,
+    category: CategoryUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
 ):
     return update_category(db, category_id, category)
 
 
 @router.delete("/{category_id}")
-def delete_category_endpoint(category_id: int, db: Session = Depends(get_db)):
+def delete_category_endpoint(
+    category_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     return delete_category(db, category_id)

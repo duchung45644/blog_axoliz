@@ -11,6 +11,7 @@ from app.crud.posts_crud import (
     delete_post,
 )
 from app.database import get_db
+from app.middleware.login import get_current_user
 
 
 router = APIRouter()
@@ -56,10 +57,19 @@ def get_post_by_id_endpoint(post_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{post_id}")
-def update_post_endpoint(post_id: int, post: PostUpdate, db: Session = Depends(get_db)):
+def update_post_endpoint(
+    post_id: int,
+    post: PostUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     return update_post(db, post_id, post)
 
 
 @router.delete("/{post_id}")
-def delete_post_endpoint(post_id: int, db: Session = Depends(get_db)):
+def delete_post_endpoint(
+    post_id: int,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
     return delete_post(db, post_id)
