@@ -6,7 +6,11 @@ class Settings(BaseSettings):
     PROJECT_NAME: str
     PROJECT_VERSION: str
     DATABASE_URL: str = ""
-    ALLOWED_ORIGINS: list = ["http://vps.axoliz.com", "http://vps.axoliz.com:5432"]
+    ALLOWED_ORIGINS: list = [
+        "http://vps.axoliz.com",
+        "http://vps.axoliz.com:5432",
+        "http://localhost:5173",
+    ]
 
     SECRET_KEY: str
     ALGORITHM: str
